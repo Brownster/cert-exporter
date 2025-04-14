@@ -4,10 +4,18 @@ This repository contains a robust PowerShell script to export certificate expiry
 
 ## Features
 - **Scans Windows Certificate Stores**: LocalMachine and CurrentUser stores (My, Root, CA by default).
+
 - **Scans Certificate Files**: Supports PEM, DER, CRT, CER, PFX, P12 files in user-specified directories. Also supports Java Keystore (`.jks`) files if Java `keytool` is available.
 - **Prometheus-Compatible Output**: Metrics are saved as a `.prom` file for easy scraping.
 - **Dynamic Labels**: Metric labels adapt to available certificate properties (store, file, subject, issuer, etc). Labels are sanitized for Prometheus compatibility (no newlines, tabs, or unescaped quotes).
 - **Configurable**: All variables (output dir, cert dirs, stores) are at the top of the script for easy adjustment.
+
+## Logging
+
+By default, log messages are printed to the console. To also log to a file:
+- Uncomment the `$LogFile` variable near the top of `cert-exporter.ps1` and set the desired log file path (e.g., `$LogFile = "$OutputDir/cert-exporter.log"`).
+- Uncomment the `Add-Content` line in the `Log-Message` function.
+- All log messages will then be appended to the specified file as well as printed to the console.
 
 ## Usage
 

@@ -5,6 +5,7 @@
 $OutputDir = "C:\cert_metrics"   # Output directory for .prom file
 $OutputFile = "cert_expiry_metrics.prom"   # Output .prom file name
 $CertDirs = @("C:\certs", "D:\more_certs") # Directories to scan for individual certificate files
+# $LogFile = "$OutputDir/cert-exporter.log"   # Uncomment to enable file logging
 $StoresToCheck = @(
     @{ Location = "LocalMachine"; Name = "My" },
     @{ Location = "LocalMachine"; Name = "Root" },
