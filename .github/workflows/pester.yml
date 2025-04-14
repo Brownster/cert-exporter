@@ -21,9 +21,26 @@ jobs:
       - name: Install Pester 5.x
         shell: pwsh
         run: Install-Module -Name Pester -Force -SkipPublisherCheck -RequiredVersion 5.5.0
+      - name: Install Pester 5.5.0
+        shell: pwsh
+        run: |
+          Install-Module -Name Pester -Force -SkipPublisherCheck -RequiredVersion 5.5.0
+
+      - name: Import correct Pester version
+        shell: pwsh
+        run: |
+          Import-Module Pester -Force -RequiredVersion 5.5.0
+
+      - name: Debug Pester version and files
+        shell: pwsh
+        run: |
+          Get-Module Pester | Format-List
+          Get-Module -ListAvailable Pester | Format-List Name,Version,Path
+
       - name: Run Pester tests with coverage
         shell: pwsh
         run: |
+          Import-Module Pester -Force -RequiredVersion 5.5.0
           $config = New-PesterConfiguration
           $config.Run.Path = 'tests'
           $config.CodeCoverage.Enabled = $true
