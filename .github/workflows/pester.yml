@@ -24,6 +24,11 @@ jobs:
       - name: Run Pester tests with coverage
         shell: pwsh
         run: |
-          $res = Invoke-Pester -Path tests/cert-exporter.Tests.ps1 -PassThru -CodeCoverage @{ Path = 'cert-exporter.ps1' }
+          $config = New-PesterConfiguration
+          $config.Run.Path = 'tests'
+          $config.CodeCoverage.Enabled = $true
+          $config.CodeCoverage.Path = 'cert-exporter.ps1'
+          $config.Output.Verbosity = 'Detailed'
+          $res = Invoke-Pester -Configuration $config -PassThru
           Write-Host "Coverage %: $($res.CodeCoverage.Percent)"
           if ($res.CodeCoverage.Percent -lt 80) { exit 1 }

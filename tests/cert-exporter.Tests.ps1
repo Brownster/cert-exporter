@@ -1,5 +1,6 @@
 BeforeAll {
-    . "$PSScriptRoot/../cert-exporter.ps1"
+    $scriptPath = Join-Path $PSScriptRoot '..' 'cert-exporter.ps1'
+    . $scriptPath
 }
 
 Describe 'Sanitize-LabelValue' {
