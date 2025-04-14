@@ -1,8 +1,9 @@
 # Pester tests for cert-exporter.ps1
 # Run with: Invoke-Pester -Output Detailed
 
-# Import script functions
-. "$PSScriptRoot/../cert-exporter.ps1"
+BeforeAll {
+    . "$PSScriptRoot/../cert-exporter.ps1"
+}
 
 Describe 'Sanitize-LabelValue' {
     It 'removes newlines and tabs, replaces quotes, and truncates' {

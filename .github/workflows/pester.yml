@@ -18,9 +18,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install Pester
+      - name: Install Pester 5.x
         shell: pwsh
-        run: Install-Module -Name Pester -Force -SkipPublisherCheck
+        run: Install-Module -Name Pester -Force -SkipPublisherCheck -RequiredVersion 5.5.0
       - name: Run Pester tests with coverage
         shell: pwsh
         run: |
