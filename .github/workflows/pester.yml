@@ -18,11 +18,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install Pester 5.5.0
-        shell: pwsh
-        run: |
-          Install-Module -Name Pester -Force -SkipPublisherCheck -RequiredVersion 5.5.0 -Scope CurrentUser
-
       - name: List all available Pester versions and paths
         shell: pwsh
         run: |
@@ -34,19 +29,17 @@ jobs:
           Write-Host "PSModulePath: $env:PSModulePath"
           Write-Host "USERPROFILE: $env:USERPROFILE"
 
-      - name: Import correct Pester version by path
+      - name: Import Pester 5.7.1 by path
         shell: pwsh
         run: |
-          $pesterPath = Join-Path (Join-Path $env:USERPROFILE 'Documents/PowerShell/Modules/Pester/5.5.0') 'Pester.psd1'
-          Import-Module $pesterPath -Force
-          Write-Host "Imported Pester from $pesterPath"
+          Import-Module 'C:\Program Files\WindowsPowerShell\Modules\Pester\5.7.1\Pester.psd1' -Force
+          Write-Host "Imported Pester 5.7.1"
           Get-Module Pester | Format-List
 
       - name: Run Pester tests with coverage
         shell: pwsh
         run: |
-          $pesterPath = Join-Path (Join-Path $env:USERPROFILE 'Documents/PowerShell/Modules/Pester/5.5.0') 'Pester.psd1'
-          Import-Module $pesterPath -Force
+          Import-Module 'C:\Program Files\WindowsPowerShell\Modules\Pester\5.7.1\Pester.psd1' -Force
           $config = New-PesterConfiguration
           $config.Run.Path = 'tests'
           $config.CodeCoverage.Enabled = $true
