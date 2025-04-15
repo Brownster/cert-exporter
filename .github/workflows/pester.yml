@@ -33,38 +33,36 @@ jobs:
         run: |
           Get-Module -ListAvailable Pester | Format-Table Name,Version,Path
           
+      - name: Confirm loaded Pester version and type
+        shell: pwsh
+        run: |
+          $env:PSModulePath = "$HOME/.local/share/powershell/Modules:" + $env:PSModulePath
+          Import-Module Pester -RequiredVersion 5.7.1 -Force
+          Get-Module Pester | Format-List Name,Version,Path
+          [PesterConfiguration]::Default
+
       - name: Run Pester tests with coverage
         shell: pwsh
         run: |
-          # Import the installed Pester module
+          $env:PSModulePath = "$HOME/.local/share/powershell/Modules:" + $env:PSModulePath
           Import-Module Pester -RequiredVersion 5.7.1 -Force
-          
-          # Configure Pester
-          $config = New-PesterConfiguration
+          Get-Module Pester | Format-List Name,Version,Path
+          $config = [PesterConfiguration]::Default
           $config.Run.Path = 'tests'
           $config.CodeCoverage.Enabled = $true
           $config.CodeCoverage.Path = 'cert-exporter.ps1'
           $config.Output.Verbosity = 'Detailed'
-          
-          # Run tests
-          $res = Invoke-Pester -Configuration $config -PassThru
-          
-          # Report results
+          $res = Invoke-Pester -Configuration $config
           Write-Host "Tests Passed: $($res.PassedCount)"
           Write-Host "Tests Failed: $($res.FailedCount)"
-          
-          # Report coverage if available
-          if ($res.CodeCoverage) {
-            Write-Host "Coverage %: $($res.CodeCoverage.CoveragePercent)"
-            
-            # Fail if coverage is below threshold
-            if ($res.CodeCoverage.CoveragePercent -lt 80) { 
+          if ($null -ne $res.CodeCoverage) {
+            $coveragePercent = [math]::Round(($res.CodeCoverage.CommandsExecutedCount / $res.CodeCoverage.CommandsAnalyzedCount) * 100, 2)
+            Write-Host "Coverage %: $coveragePercent"
+            if ($coveragePercent -lt 80) { 
               Write-Error "Code coverage below threshold (80%)"
               exit 1 
             }
           }
-          
-          # Fail if any tests failed
           if ($res.FailedCount -gt 0) { 
             Write-Error "Tests failed"
             exit 1 
