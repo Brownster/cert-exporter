@@ -1,5 +1,4 @@
 name: Pester Tests
-
 on:
   push:
     paths:
@@ -18,47 +17,55 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
       - name: Print PowerShell version
         shell: pwsh
         run: |
           $PSVersionTable
-      - name: List all available Pester versions and paths
-        shell: pwsh
-        run: |
-          Get-Module -ListAvailable Pester | Format-Table Name,Version,Path
-
-      - name: Print PSModulePath and USERPROFILE
-        shell: pwsh
-        run: |
-          Write-Host "PSModulePath: $env:PSModulePath"
-          Write-Host "USERPROFILE: $env:USERPROFILE"
-
-      - name: Install Pester 5.7.1 for pwsh
+          
+      - name: Install Pester 5.7.1
         shell: pwsh
         run: |
           Install-Module -Name Pester -Force -SkipPublisherCheck -RequiredVersion 5.7.1 -Scope CurrentUser
-
-      - name: List Pester modules in user paths
+          
+      - name: Verify Pester installation
         shell: pwsh
         run: |
-          Get-ChildItem -Recurse -Filter Pester.psd1 $HOME/.local/share/powershell/Modules, $HOME/Documents/PowerShell/Modules
-
-      - name: Import Pester 5.7.1 for pwsh by path
-        shell: pwsh
-        run: |
-          Import-Module "$HOME/.local/share/powershell/Modules/Pester/5.7.1/Pester.psd1" -Force
-          Write-Host "Imported Pester 5.7.1 for pwsh"
-          Get-Module Pester | Format-List
-
+          Get-Module -ListAvailable Pester | Format-Table Name,Version,Path
+          
       - name: Run Pester tests with coverage
         shell: pwsh
         run: |
-          Import-Module "$HOME/.local/share/powershell/Modules/Pester/5.7.1/Pester.psd1" -Force
+          # Import the installed Pester module
+          Import-Module Pester -RequiredVersion 5.7.1 -Force
+          
+          # Configure Pester
           $config = New-PesterConfiguration
           $config.Run.Path = 'tests'
           $config.CodeCoverage.Enabled = $true
           $config.CodeCoverage.Path = 'cert-exporter.ps1'
           $config.Output.Verbosity = 'Detailed'
+          
+          # Run tests
           $res = Invoke-Pester -Configuration $config -PassThru
-          Write-Host "Coverage %: $($res.CodeCoverage.Percent)"
-          if ($res.CodeCoverage.Percent -lt 80) { exit 1 }
+          
+          # Report results
+          Write-Host "Tests Passed: $($res.PassedCount)"
+          Write-Host "Tests Failed: $($res.FailedCount)"
+          
+          # Report coverage if available
+          if ($res.CodeCoverage) {
+            Write-Host "Coverage %: $($res.CodeCoverage.CoveragePercent)"
+            
+            # Fail if coverage is below threshold
+            if ($res.CodeCoverage.CoveragePercent -lt 80) { 
+              Write-Error "Code coverage below threshold (80%)"
+              exit 1 
+            }
+          }
+          
+          # Fail if any tests failed
+          if ($res.FailedCount -gt 0) { 
+            Write-Error "Tests failed"
+            exit 1 
+          }
