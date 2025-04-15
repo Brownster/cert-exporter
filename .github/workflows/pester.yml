@@ -23,6 +23,17 @@ jobs:
         run: |
           Install-Module -Name Pester -Force -SkipPublisherCheck -RequiredVersion 5.5.0 -Scope CurrentUser
 
+      - name: List all available Pester versions and paths
+        shell: pwsh
+        run: |
+          Get-Module -ListAvailable Pester | Format-Table Name,Version,Path
+
+      - name: Print PSModulePath and USERPROFILE
+        shell: pwsh
+        run: |
+          Write-Host "PSModulePath: $env:PSModulePath"
+          Write-Host "USERPROFILE: $env:USERPROFILE"
+
       - name: Import correct Pester version by path
         shell: pwsh
         run: |
