@@ -22,10 +22,6 @@ jobs:
         shell: pwsh
         run: |
           $PSVersionTable
-      - name: Setup PowerShell 7
-        uses: actions/setup-powershell@v2
-        with:
-          pwsh-version: '7.4.x'
       - name: List all available Pester versions and paths
         shell: pwsh
         run: |
