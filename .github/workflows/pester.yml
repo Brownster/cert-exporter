@@ -33,17 +33,27 @@ jobs:
           Write-Host "PSModulePath: $env:PSModulePath"
           Write-Host "USERPROFILE: $env:USERPROFILE"
 
-      - name: Import Pester 5.7.1 by path
+      - name: Install Pester 5.7.1 for pwsh
         shell: pwsh
         run: |
-          Import-Module 'C:\Program Files\WindowsPowerShell\Modules\Pester\5.7.1\Pester.psd1' -Force
-          Write-Host "Imported Pester 5.7.1"
+          Install-Module -Name Pester -Force -SkipPublisherCheck -RequiredVersion 5.7.1 -Scope CurrentUser
+
+      - name: List Pester modules in user paths
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse -Filter Pester.psd1 $HOME/.local/share/powershell/Modules, $HOME/Documents/PowerShell/Modules
+
+      - name: Import Pester 5.7.1 for pwsh by path
+        shell: pwsh
+        run: |
+          Import-Module "$HOME/.local/share/powershell/Modules/Pester/5.7.1/Pester.psd1" -Force
+          Write-Host "Imported Pester 5.7.1 for pwsh"
           Get-Module Pester | Format-List
 
       - name: Run Pester tests with coverage
         shell: pwsh
         run: |
-          Import-Module 'C:\Program Files\WindowsPowerShell\Modules\Pester\5.7.1\Pester.psd1' -Force
+          Import-Module "$HOME/.local/share/powershell/Modules/Pester/5.7.1/Pester.psd1" -Force
           $config = New-PesterConfiguration
           $config.Run.Path = 'tests'
           $config.CodeCoverage.Enabled = $true
